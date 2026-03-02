@@ -5,13 +5,16 @@ import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { CheckCircle2, ChevronRight, Play } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>(null);
     const [todayPlan, setTodayPlan] = useState<any>(null);
     const [progress, setProgress] = useState(0); // 0 to 100
+    const [currentWeight, setCurrentWeight] = useState(0);
     const supabase = createClient();
+    const router = useRouter(); // Import useRouter at the top of the file
 
     useEffect(() => {
         async function loadDashboardData() {
@@ -25,7 +28,24 @@ export default function DashboardPage() {
                 .eq('id', user.id)
                 .single();
 
+            // Redirect to onboarding if profile isn't set up yet
+            if (!profileData || !profileData.height) {
+                window.location.href = '/onboarding';
+                return;
+            }
+
             setProfile(profileData);
+
+            // Fetch Latest Weight
+            const { data: weightData } = await supabase
+                .from('weight_logs')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            setCurrentWeight(weightData?.weight || 0);
 
             // Fetch Latest Workout Plan
             const { data: planData } = await supabase
@@ -84,9 +104,9 @@ export default function DashboardPage() {
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-2xl font-bold">오운완 대시보드</h1>
-                    {profile && (
+                    {profile && currentWeight > 0 && (
                         <p className="text-sm text-foreground/70 mt-1">
-                            목표까지 <span className="font-bold text-primary">{Math.abs(profile.target_weight - 70).toFixed(1)}kg</span> 남았어요!
+                            목표까지 <span className="font-bold text-primary">{Math.abs(profile.target_weight - currentWeight).toFixed(1)}kg</span> 남았어요!
                         </p>
                     )}
                 </div>
@@ -170,7 +190,7 @@ export default function DashboardPage() {
             <motion.div
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
-                className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-[380px] z-30"
+                className="fixed bottom-6 left-6 right-6 mx-auto max-w-[380px] z-30 flex justify-center w-auto"
             >
                 <Link
                     href="/workout"
