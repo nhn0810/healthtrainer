@@ -1,12 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function GatePage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+
+    // Prevent prompt globally for the gate page
+    useEffect(() => {
+        const preventInstall = (e: any) => {
+            e.preventDefault();
+        };
+        window.addEventListener('beforeinstallprompt', preventInstall);
+        return () => window.removeEventListener('beforeinstallprompt', preventInstall);
+    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
