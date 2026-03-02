@@ -1,10 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-if (!process.env.GEMINI_API_KEY) {
-    throw new Error("Missing GEMINI_API_KEY environment variable");
-}
-
-export const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// Next.js 빌드 시 Vercel 등의 CI 환경에서 시작 시점에 환경변수가 비어있어도 크래시가 나지 않도록 기본값 처리
+const apiKey = process.env.GEMINI_API_KEY || 'dummy_key_for_build';
+export const genAI = new GoogleGenerativeAI(apiKey);
 
 // Define models mapped to appropriate versions
 export const aiModels = {
