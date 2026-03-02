@@ -6,8 +6,6 @@ import { createClient } from '@/lib/supabase/client';
 import { CheckCircle2, ChevronRight, Play } from 'lucide-react';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
-
 export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>(null);

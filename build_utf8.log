@@ -6,232 +6,44 @@
   - Environments: .env.local
 
    Creating an optimized production build ...
-> [PWA] Compile server
-> [PWA] Compile server
-> [PWA] Compile client (static)
-> [PWA] Auto register service worker with: C:\Users\rlask\Desktop\neohealth\node_modules\next-pwa\register.js
-> [PWA] Service worker: C:\Users\rlask\Desktop\neohealth\public\sw.js
-> [PWA]   url: /sw.js
-> [PWA]   scope: /
+ ??(pwa) Compiling for server...
+ ??(pwa) Compiling for server...
+ ??(pwa) Compiling for client (static)...
+ ??(pwa) Service worker: C:\Users\rlask\Desktop\neohealth\public\sw.js
+ ??(pwa)   URL: /sw.js
+ ??(pwa)   Scope: /
  ??Compiled successfully
    Linting and checking validity of types ...
    Collecting page data ...
    Generating static pages (0/17) ...
 node.exe : 
 위치 줄:1 문자:1
-+ & "C:\Program Files\nodejs/no
-de.exe" "C:\Program Files\nodej
-s/node_mo ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~
-    + CategoryInfo          :  
-   NotSpecified: (:String) []  
-  , RemoteException
-    + FullyQualifiedErrorId :  
-   NativeCommandError
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
  
-Error occurred prerendering pag
-e "/". Read more: https://nextj
-s.org/docs/messages/prerender-e
-rror
+Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
 
-TypeError: Cannot read properti
-es of undefined (reading 'clien
-tModules')
-    at C:\Users\rlask\Desktop\n
-eohealth\node_modules\next\dist
-\compiled\next-server\app-page.
-runtime.prod.js:17:24397
-    at C:\Users\rlask\Desktop\n
-eohealth\node_modules\next\dist
-\server\lib\trace\tracer.js:191
-:62
-    at C:\Users\rlask\Desktop\n
-eohealth\node_modules\next\dist
-\server\lib\trace\tracer.js:140
-:36
-    at NoopContextManager.with 
-(C:\Users\rlask\Desktop\neoheal
-th\node_modules\@opentelemetry\
-api\build\src\context\NoopConte
-xtManager.js:25:19)
-    at ContextAPI.with (C:\User
-s\rlask\Desktop\neohealth\node_
-modules\@opentelemetry\api\buil
-d\src\api\context.js:60:46)
-    at NoopTracer.startActiveSp
-an (C:\Users\rlask\Desktop\neoh
-ealth\node_modules\@opentelemet
-ry\api\build\src\trace\NoopTrac
-er.js:65:31)
-    at ProxyTracer.startActiveS
-pan (C:\Users\rlask\Desktop\neo
-health\node_modules\@openteleme
-try\api\build\src\trace\ProxyTr
-acer.js:36:24)
-    at C:\Users\rlask\Desktop\n
-eohealth\node_modules\next\dist
-\server\lib\trace\tracer.js:122
-:103
-    at NoopContextManager.with 
-(C:\Users\rlask\Desktop\neoheal
-th\node_modules\@opentelemetry\
-api\build\src\context\NoopConte
-xtManager.js:25:19)
-    at ContextAPI.with (C:\User
-s\rlask\Desktop\neohealth\node_
-modules\@opentelemetry\api\buil
-d\src\api\context.js:60:46)
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /diet. Please move it 
-to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /diet. Please move it 
-to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /gate. Please move it 
-to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /gate. Please move it 
-to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /_not-found. Please mo
-ve it to viewport export instea
-d.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /_not-found. Please mo
-ve it to viewport export instea
-d.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /chat. Please move it 
-to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /chat. Please move it 
-to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /onboarding. Please mo
-ve it to viewport export instea
-d.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /onboarding. Please mo
-ve it to viewport export instea
-d.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /login. Please move it
- to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /login. Please move it
- to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
+TypeError: Cannot read properties of undefined (reading 'clientModules')
+    at C:\Users\rlask\Desktop\neohealth\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:17:24397
+    at C:\Users\rlask\Desktop\neohealth\node_modules\next\dist\server\lib\trace\tracer.js:191:62
+    at C:\Users\rlask\Desktop\neohealth\node_modules\next\dist\server\lib\trace\tracer.js:140:36
+    at NoopContextManager.with (C:\Users\rlask\Desktop\neohealth\node_modules\@opentelemetry\api\build\src\context\NoopContext
+Manager.js:25:19)
+    at ContextAPI.with (C:\Users\rlask\Desktop\neohealth\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
+    at NoopTracer.startActiveSpan (C:\Users\rlask\Desktop\neohealth\node_modules\@opentelemetry\api\build\src\trace\NoopTracer
+.js:65:31)
+    at ProxyTracer.startActiveSpan (C:\Users\rlask\Desktop\neohealth\node_modules\@opentelemetry\api\build\src\trace\ProxyTrac
+er.js:36:24)
+    at C:\Users\rlask\Desktop\neohealth\node_modules\next\dist\server\lib\trace\tracer.js:122:103
+    at NoopContextManager.with (C:\Users\rlask\Desktop\neohealth\node_modules\@opentelemetry\api\build\src\context\NoopContext
+Manager.js:25:19)
+    at ContextAPI.with (C:\Users\rlask\Desktop\neohealth\node_modules\@opentelemetry\api\build\src\api\context.js:60:46)
    Generating static pages (4/17) 
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /settings. Please move
- it to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /settings. Please move
- it to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /workout. Please move 
-it to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /workout. Please move 
-it to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
    Generating static pages (8/17) 
    Generating static pages (12/17) 
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /register. Please move
- it to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /gallery. Please move 
-it to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /register. Please move
- it to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
- ??Unsupported metadata themeCo
-lor is configured in metadata e
-xport in /gallery. Please move 
-it to viewport export instead.
-Read more: https://nextjs.org/d
-ocs/app/api-reference/functions
-/generate-viewport
  ??Generating static pages (17/17)
 
-> Export encountered errors on 
-following paths:
+> Export encountered errors on following paths:
 	/(dashboard)/page: /
