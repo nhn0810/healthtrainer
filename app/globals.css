@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #FFFFFF;
+    --foreground: #171717;
+    
+    --primary: #007BFF; /* Electric Blue for light mode */
+    --primary-foreground: #FFFFFF;
+    
+    --secondary: #F3F4F6;
+    --secondary-foreground: #111827;
+    
+    --border: #E5E7EB;
+    
+    --accent: #39FF14;
+    --accent-foreground: #000000;
+  }
+
+  /* Defaulting to dark mode as discussed in PRD, or switching via class */
+  .dark {
+    --background: #000000;
+    --foreground: #EDEDED;
+    
+    --primary: #39FF14; /* Neon Green point color */
+    --primary-foreground: #000000;
+    
+    --secondary: #1F2937;
+    --secondary-foreground: #F9FAFB;
+    
+    --border: #374151;
+    
+    --accent: #FF5F1F;
+    --accent-foreground: #FFFFFF;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground;
+  }
+}
+
+/* Glassmorphism utility for cards/surfaces */
+.glass {
+  @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-lg dark:bg-black/30 dark:border-white/5;
+}
