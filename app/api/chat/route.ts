@@ -59,7 +59,7 @@ export async function POST(req: Request) {
             : '초기 정보 없음';
 
         const result = await streamText({
-            model: google('gemini-1.5-flash'),
+            model: google('gemini-3-flash'),
             system: `당신은 사용자의 멘탈 케어와 운동, 식단을 완벽하게 관리하는 1:1 전담 초개인화 AI 트레이너입니다. 친근하면서도 목표 달성을 위해 단호한 한국어 톤을 유지하세요.
       
       [사용자 실시간 동기화 정보]
