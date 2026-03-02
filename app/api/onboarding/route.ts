@@ -22,13 +22,19 @@ export async function POST(req: Request) {
 
     const prompt = `
       당신은 세계 최고의 AI 퍼스널 트레이너 "AI Edge Coach"입니다.
-      아래 사용자의 신체 정보와 환경을 바탕으로 맞춤형 운동 및 식단 가이드라인을 작성해주세요.
-      결과는 반드시 JSON 형식으로만 응답해야 하며, 다른 텍스트는 포함하지 마세요.
+      아래 사용자의 신체 정보와 환경을 바탕으로 가장 현실적이고 효율적인 1:1 맞춤형 7일 운동 및 식단 가이드라인을 작성해주세요.
+      결과는 반드시 JSON 형식으로만 응답해야 하며, 다른 텍스트는 전혀 포함하지 마세요.
+
+      [초개인화 규칙 - 중요!]
+      1. 사용자의 목표 체중 도달까지 필요한 일일 칼로리 섭취량(dailyCaloriesTarget)을 정확히 계산하세요. (감량/증량 여부에 맞춰서)
+      2. 사용자의 운동 환경(${environment})과 보유 장비(${equipment})에 정확히 일치하는 운동만 추천하세요. (예: 헬스장 환경이면 기구 위주, 홈트이고 맨몸이면 맨몸 운동 위주)
+      3. 목표 기간(${duration}주) 내에 목표를 달성할 수 있도록 강도를 점진적으로 설정하세요.
 
       [사용자 정보]
       - 키: ${height}cm
       - 현재 체중: ${currentWeight}kg
       - 목표 체중: ${targetWeight}kg
+      - 감량/증량 목표 갭: ${parseFloat(targetWeight) - parseFloat(currentWeight)}kg
       - 주 운동 환경: ${environment}
       - 보유 장비: ${equipment}
       - 목표 기간: ${duration}주
