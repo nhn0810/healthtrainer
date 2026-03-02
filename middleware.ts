@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
     const hasGateCookie = request.cookies.has('edge_gate_passed');
     const url = request.nextUrl.clone();
+    const isPwa = url.searchParams.get('source') === 'pwa';
 
     // Ignore static files, api, _next
     if (
@@ -14,12 +15,19 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // Allow the gate page itself and the home screen
-    if (url.pathname === '/gate' || url.pathname === '/') {
+    // If PWA, automatically grant gate access and send to login
+    if (isPwa && !hasGateCookie) {
+        const response = NextResponse.redirect(new URL('/login', request.url));
+        response.cookies.set('edge_gate_passed', 'true', { path: '/', maxAge: 60 * 60 * 24 * 30 });
+        return response;
+    }
+
+    // Allow the gate page itself
+    if (url.pathname === '/gate') {
         return NextResponse.next();
     }
 
-    // If attempting to access the app logic (including auth pages) without passing gate, redirect to gate
+    // If attempting to access anything else without passing gate, redirect to gate
     if (!hasGateCookie) {
         url.pathname = '/gate';
         return NextResponse.redirect(url);

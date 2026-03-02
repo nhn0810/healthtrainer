@@ -2,7 +2,7 @@
     "name": "AI Edge Coach",
     "short_name": "EdgeCoach",
     "description": "당신보다 당신을 더 잘 아는 AI 트레이너",
-    "start_url": "/gate",
+    "start_url": "/?source=pwa",
     "display": "standalone",
     "background_color": "#000000",
     "theme_color": "#000000",

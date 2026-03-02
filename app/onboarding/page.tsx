@@ -187,7 +187,7 @@ export default function OnboardingPage() {
                                 <div className="p-6 rounded-2xl glass flex flex-col items-center justify-center space-y-4 mt-8">
                                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
                                     <p className="text-sm font-medium animate-pulse text-center">
-                                        Gemini 1.5 Pro가 당신만을 위한<br />초개인화 플랜을 분석하고 있습니다...
+                                        AI 트레이너가 당신만을 위한<br />초개인화 플랜을 분석하고 있습니다...
                                     </p>
                                 </div>
                             )}
