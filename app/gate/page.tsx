@@ -11,8 +11,8 @@ export default function GatePage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (password === 'healthtrainer1928') {
-            // Set a simple cookie or local storage to mark as passed
-            localStorage.setItem('gate_passed', 'true');
+            // Set cookie for 30 days to persist access across OAuth redirects and PWA closing
+            document.cookie = "edge_gate_passed=true; path=/; max-age=" + 60 * 60 * 24 * 30 + "; SameSite=Lax";
             router.push('/login');
         } else {
             setError('비밀번호가 일치하지 않습니다.');

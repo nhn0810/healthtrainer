@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
@@ -11,8 +11,27 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const router = useRouter();
     const supabase = createClient();
+
+    useEffect(() => {
+        const handler = (e: any) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+        };
+        window.addEventListener('beforeinstallprompt', handler);
+        return () => window.removeEventListener('beforeinstallprompt', handler);
+    }, []);
+
+    const handleInstallClick = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            setDeferredPrompt(null);
+        }
+    };
 
     const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,6 +74,18 @@ export default function LoginPage() {
                     <h1 className="text-3xl font-bold tracking-tight">로그인</h1>
                     <p className="text-sm text-foreground/70">AI 트레이너와 다시 연결하세요</p>
                 </div>
+
+                {deferredPrompt && (
+                    <div className="bg-primary/10 border border-primary/20 p-4 rounded-2xl flex flex-col items-center gap-3 mb-6">
+                        <p className="text-sm font-medium">더 쾌적한 환경을 위해 앱으로 설치하시겠어요?</p>
+                        <button
+                            onClick={handleInstallClick}
+                            className="px-6 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-xl"
+                        >
+                            앱 다운로드 및 설치
+                        </button>
+                    </div>
+                )}
 
                 <form onSubmit={handleEmailLogin} className="space-y-4">
                     <div className="space-y-3 text-left">
@@ -102,13 +133,6 @@ export default function LoginPage() {
                         className="w-full py-3 rounded-xl bg-white text-black font-semibold border border-gray-200 hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                     >
                         Google로 시작하기
-                    </button>
-                    <button
-                        onClick={() => handleOAuthLogin('kakao')}
-                        disabled={loading}
-                        className="w-full py-3 rounded-xl bg-[#FEE500] text-black font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                    >
-                        카카오로 시작하기
                     </button>
                 </div>
 
