@@ -8,14 +8,22 @@ export default function GatePage() {
     const [error, setError] = useState('');
     const router = useRouter();
 
-    // Prevent prompt globally for the gate page
+    // Prevent prompt globally for the gate page and check if standalone app
     useEffect(() => {
+        // Automatically bypass Gate if running as an installed PWA (Standalone Mode)
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+        if (isStandalone) {
+            document.cookie = "edge_gate_passed=true; path=/; max-age=" + 60 * 60 * 24 * 30 + "; SameSite=Lax";
+            router.push('/login');
+            return;
+        }
+
         const preventInstall = (e: any) => {
             e.preventDefault();
         };
         window.addEventListener('beforeinstallprompt', preventInstall);
         return () => window.removeEventListener('beforeinstallprompt', preventInstall);
-    }, []);
+    }, [router]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
