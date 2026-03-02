@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import EdgeSidebar from '@/components/layout/EdgeSidebar';
@@ -6,11 +6,14 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
+export const viewport: Viewport = {
+    themeColor: '#000000',
+};
+
 export const metadata: Metadata = {
     title: 'AI Edge Coach',
     description: 'AI-based personal training and diet management',
     manifest: '/manifest.json',
-    themeColor: '#000000',
     appleWebApp: {
         capable: true,
         statusBarStyle: 'black-translucent',
