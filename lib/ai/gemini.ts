@@ -7,9 +7,9 @@ export const genAI = new GoogleGenerativeAI(apiKey);
 // Define models mapped to appropriate versions
 export const aiModels = {
     // Use 3.1 Pro for deep planning and complex contextual generation
-    planning: genAI.getGenerativeModel({ model: "gemini-3.1-pro" }),
+    planning: genAI.getGenerativeModel({ model: "gemini-3.1-pro-preview" }),
 
     // Use 3 Flash for fast vision (diet photo analysis) and quick chat feedback
-    fastVision: genAI.getGenerativeModel({ model: "gemini-3-flash" }),
-    fastChat: genAI.getGenerativeModel({ model: "gemini-3-flash" }),
+    fastVision: genAI.getGenerativeModel({ model: "gemini-3-flash-preview" }),
+    fastChat: genAI.getGenerativeModel({ model: "gemini-3-flash-preview" }),
 };
