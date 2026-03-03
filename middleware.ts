@@ -33,7 +33,11 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    return NextResponse.next();
+    // Instead of just passing, update the cookie to renew the 30-day session
+    // We clone the response to allow setting cookies
+    const response = NextResponse.next();
+    response.cookies.set('edge_gate_passed', 'true', { path: '/', maxAge: 60 * 60 * 24 * 30 });
+    return response;
 }
 
 export const config = {

@@ -87,45 +87,6 @@ export default function LoginPage() {
                     </div>
                 )}
 
-                <form onSubmit={handleEmailLogin} className="space-y-4">
-                    <div className="space-y-3 text-left">
-                        <input
-                            type="email"
-                            placeholder="이메일"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-border bg-background/50 backdrop-blur-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                            required
-                        />
-                        <input
-                            type="password"
-                            placeholder="비밀번호"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-border bg-background/50 backdrop-blur-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                            required
-                        />
-                        {error && <p className="text-sm text-red-500 font-medium px-1">{error}</p>}
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center"
-                    >
-                        {loading ? '로그인 중...' : '이메일로 로그인'}
-                    </button>
-                </form>
-
-                <div className="relative my-6">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-border" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-foreground/50">또는</span>
-                    </div>
-                </div>
-
                 <div className="space-y-3">
                     <button
                         onClick={() => handleOAuthLogin('google')}
@@ -134,14 +95,8 @@ export default function LoginPage() {
                     >
                         Google로 시작하기
                     </button>
+                    {error && <p className="text-sm text-red-500 font-medium px-1 mt-2">{error}</p>}
                 </div>
-
-                <p className="text-sm text-foreground/70 mt-6 pt-4">
-                    계정이 없으신가요?{' '}
-                    <Link href="/register" className="text-primary font-medium hover:underline">
-                        가입하기
-                    </Link>
-                </p>
             </div>
         </div>
     );
