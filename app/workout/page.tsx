@@ -56,25 +56,25 @@ export default function WorkoutPage() {
 
     const handleSetComplete = async (exerciseIdx: number, setIdx: number) => {
         const key = `${exerciseIdx}-${setIdx}`;
-        const isCompleted = !completedSets[key];
 
-        setCompletedSets(prev => {
-            const next = { ...prev };
-            if (isCompleted) next[key] = true;
-            else delete next[key];
-            return next;
-        });
+        // Block undo: if already completed, do nothing!
+        if (completedSets[key]) return;
+
+        setCompletedSets(prev => ({
+            ...prev,
+            [key]: true
+        }));
 
         // Optimistically calculate new progress and push to DB
         if (progressId) {
-            const newCompletedCount = isCompleted ? currentCompletedCount + 1 : currentCompletedCount - 1;
+            const newCompletedCount = currentCompletedCount + 1;
             const newRate = totalSets > 0 ? Math.round((newCompletedCount / totalSets) * 100) : 0;
 
             await supabase
                 .from('daily_progress')
                 .update({
                     progress_rate: newRate,
-                    workout_completed: newRate === 100
+                    workout_completed: newRate >= 100
                 })
                 .eq('id', progressId);
         }
@@ -142,8 +142,8 @@ export default function WorkoutPage() {
                                         whileTap={{ scale: 0.9 }}
                                         onClick={() => handleSetComplete(eIdx, sIdx)}
                                         className={`h-12 rounded-xl flex items-center justify-center font-bold text-sm transition-colors ${isDone
-                                                ? 'bg-primary text-primary-foreground border-transparent'
-                                                : 'bg-secondary/50 text-foreground border border-border hover:border-primary/50'
+                                            ? 'bg-primary text-primary-foreground border-transparent'
+                                            : 'bg-secondary/50 text-foreground border border-border hover:border-primary/50'
                                             }`}
                                     >
                                         {isDone ? <Check className="w-5 h-5 stroke-[3]" /> : `${sIdx + 1}세트`}

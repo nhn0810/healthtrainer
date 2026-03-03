@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Dumbbell, Utensils, Activity, MessageSquare, Settings } from 'lucide-react';
+import { Home, Dumbbell, Utensils, Activity, MessageSquare, Settings, Target } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -12,6 +12,7 @@ const menuItems = [
     { name: '식단', icon: Utensils, href: '/diet' },
     { name: '변화기록', icon: Activity, href: '/gallery' },
     { name: 'AI 트레이너', icon: MessageSquare, href: '/chat' },
+    { name: '나의 목표', icon: Target, href: '/goals' },
     { name: '설정', icon: Settings, href: '/settings' },
 ];
 
@@ -78,8 +79,8 @@ export default function EdgeSidebar() {
                                         href={item.href}
                                         onClick={() => setIsOpen(false)}
                                         className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${isActive
-                                                ? 'bg-primary/10 text-primary font-bold'
-                                                : 'text-foreground/80 hover:bg-white/5 hover:text-foreground'
+                                            ? 'bg-primary/10 text-primary font-bold'
+                                            : 'text-foreground/80 hover:bg-white/5 hover:text-foreground'
                                             }`}
                                     >
                                         <item.icon className="w-5 h-5" />
