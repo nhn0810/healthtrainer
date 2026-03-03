@@ -2,11 +2,11 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
-    let response = NextResponse.next({
+    let supabaseResponse = NextResponse.next({
         request: {
             headers: request.headers,
         },
-    })
+    });
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,29 +14,28 @@ export async function middleware(request: NextRequest) {
         {
             cookies: {
                 get(name: string) {
-                    return request.cookies.get(name)?.value
+                    return request.cookies.get(name)?.value;
                 },
                 set(name: string, value: string, options: CookieOptions) {
-                    // This explicitly sets persistent cookies to prevent app from logging out
-                    request.cookies.set({ name, value, ...options, maxAge: 60 * 60 * 24 * 365, path: '/' })
-                    response = NextResponse.next({
+                    request.cookies.set({ name, value, ...options });
+                    supabaseResponse = NextResponse.next({
                         request: { headers: request.headers },
-                    })
-                    response.cookies.set({ name, value, ...options, maxAge: 60 * 60 * 24 * 365, path: '/' })
+                    });
+                    supabaseResponse.cookies.set({ name, value, ...options });
                 },
                 remove(name: string, options: CookieOptions) {
-                    request.cookies.set({ name, value: '', ...options })
-                    response = NextResponse.next({
+                    request.cookies.set({ name, value: '', ...options });
+                    supabaseResponse = NextResponse.next({
                         request: { headers: request.headers },
-                    })
-                    response.cookies.set({ name, value: '', ...options })
+                    });
+                    supabaseResponse.cookies.set({ name, value: '', ...options });
                 },
             },
         }
-    )
+    );
 
-    // IMPORTANT: This triggers token refresh implicitly if needed properly extending Google session!
-    await supabase.auth.getUser()
+    // Refresh context
+    const { data: { user } } = await supabase.auth.getUser();
 
     const hasGateCookie = request.cookies.has('edge_gate_passed');
     const url = request.nextUrl.clone();
@@ -46,27 +45,51 @@ export async function middleware(request: NextRequest) {
     if (
         url.pathname.startsWith('/_next') ||
         url.pathname.startsWith('/api') ||
-        url.pathname.includes('.')
+        url.pathname.includes('.') ||
+        url.pathname.startsWith('/auth/callback')
     ) {
-        return response;
+        return supabaseResponse;
     }
 
-    // If PWA or gate passed, continuously renew the gate cookie
+    const isAuthPage = url.pathname === '/login' || url.pathname === '/gate' || url.pathname === '/';
+
+    // If logged in and trying to access an auth page (like / or /login), redirect to dashboard
+    if (user && isAuthPage) {
+        url.pathname = '/dashboard';
+        const redirectRes = NextResponse.redirect(url);
+        // Copy over any cookies created by auth refresh
+        supabaseResponse.cookies.getAll().forEach(c => {
+            redirectRes.cookies.set(c.name, c.value, c);
+        });
+        return redirectRes;
+    }
+
+    // Require authentication for protected routes
+    if (!user && !isAuthPage) {
+        url.pathname = '/login';
+        const redirectRes = NextResponse.redirect(url);
+        supabaseResponse.cookies.getAll().forEach(c => {
+            redirectRes.cookies.set(c.name, c.value, c);
+        });
+        return redirectRes;
+    }
+
+    // PWA & Gate Cookie Renewal
     if (isPwa || hasGateCookie) {
         if (!hasGateCookie && url.pathname !== '/login') {
             url.pathname = '/login';
-            response = NextResponse.redirect(url);
+            const redirectRes = NextResponse.redirect(url);
+            redirectRes.cookies.set('edge_gate_passed', 'true', { path: '/', maxAge: 60 * 60 * 24 * 30 });
+            return redirectRes;
         }
-        response.cookies.set('edge_gate_passed', 'true', { path: '/', maxAge: 60 * 60 * 24 * 30 });
-        return response;
+        supabaseResponse.cookies.set('edge_gate_passed', 'true', { path: '/', maxAge: 60 * 60 * 24 * 30 });
+        return supabaseResponse;
     }
 
-    // Allow the gate page itself
     if (url.pathname === '/gate') {
-        return response;
+        return supabaseResponse;
     }
 
-    // Redirect to gate
     url.pathname = '/gate';
     return NextResponse.redirect(url);
 }

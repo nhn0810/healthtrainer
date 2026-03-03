@@ -85,8 +85,7 @@ export default function ChatPage() {
                                 <Bot className="w-4 h-4" />
                             </div>
                             <div className="px-4 py-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 font-bold text-xs leading-relaxed rounded-tl-sm">
-                                일일 한도를 초과했습니다! 개발자에게 서버비가 없어요 ㅠㅠ<br />
-                                설정 메뉴에서 무제한 코드를 입력해주세요.
+                                {error.message || '오류가 발생했습니다. 다시 로그인하시거나 관리자에게 문의하세요.'}
                             </div>
                         </motion.div>
                     )}
