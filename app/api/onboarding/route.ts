@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { height, currentWeight, targetWeight, environment, equipment, duration } = body;
+    const { height, currentWeight, targetWeight, environment, equipment, targetDate } = body;
 
     const prompt = `
       당신은 세계 최고의 AI 퍼스널 트레이너 "AI Edge Coach"입니다.
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       [초개인화 규칙 - 중요!]
       1. 사용자의 목표 체중 도달까지 필요한 일일 칼로리 섭취량(dailyCaloriesTarget)을 정확히 계산하세요. (감량/증량 여부에 맞춰서)
       2. 사용자의 운동 환경(${environment})과 보유 장비(${equipment})에 정확히 일치하는 운동만 추천하세요. (예: 헬스장 환경이면 기구 위주, 홈트이고 맨몸이면 맨몸 운동 위주)
-      3. 목표 기간(${duration}주) 내에 목표를 달성할 수 있도록 강도를 점진적으로 설정하세요.
+      3. 최종 목표일(${targetDate}) 내에 목표를 달성할 수 있도록 이번 2주간의 플랜 강도를 점진적으로 설정하세요.
 
       [사용자 정보]
       - 키: ${height}cm
@@ -37,7 +37,8 @@ export async function POST(req: Request) {
       - 감량/증량 목표 갭: ${parseFloat(targetWeight) - parseFloat(currentWeight)}kg
       - 주 운동 환경: ${environment}
       - 보유 장비: ${equipment}
-      - 목표 기간: ${duration}주
+      - 최종 목표일: ${targetDate} (장기 목표)
+      - 이번 세부 플랜 기간: 14일 (2주치만 생성!)
 
       [요청 스펙 (JSON 스키마)]
       {
@@ -74,6 +75,7 @@ export async function POST(req: Request) {
     await supabase.from('profiles').update({
       height: parseFloat(height),
       target_weight: parseFloat(targetWeight),
+      target_date: targetDate,
       env_info: environment,
       equipment: equipment
     }).eq('id', user.id);
@@ -89,8 +91,8 @@ export async function POST(req: Request) {
       user_id: user.id,
       plan_data: planData,
       start_date: new Date().toISOString().split('T')[0],
-      // Calculate end date based on duration (weeks)
-      end_date: new Date(Date.now() + parseInt(duration) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      // Calculate end date based on fixed 14 days (2 weeks)
+      end_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     });
 
     if (planError) throw new Error('Failed to save workout plan: ' + planError.message);

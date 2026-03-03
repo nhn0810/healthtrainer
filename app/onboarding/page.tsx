@@ -23,7 +23,7 @@ export default function OnboardingPage() {
         targetWeight: '',
         environment: '자취방 (좁은 공간)',
         equipment: '맨몸',
-        duration: '2' // Fixed to 2 weeks
+        targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     });
 
     const handleNext = () => {
@@ -168,10 +168,14 @@ export default function OnboardingPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm text-foreground/70">목표 달성 기간</label>
-                                    <div className="w-full px-4 py-3 rounded-xl border border-white/10 bg-background/50 text-foreground/70 font-medium">
-                                        트레이너가 2주 단위 플랜을 제공합니다.
-                                    </div>
+                                    <label className="text-sm text-foreground/70">최종 목표 달성일</label>
+                                    <input
+                                        type="date"
+                                        value={formData.targetDate}
+                                        onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
+                                        className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary outline-none"
+                                    />
+                                    <p className="text-xs text-foreground/50 mt-1">※ 이 날짜까지의 장기 목표를 기준으로, 2주 단위의 세부 플랜이 발급됩니다.</p>
                                 </div>
 
                                 {error && <p className="text-sm text-red-500 font-medium">{error}</p>}

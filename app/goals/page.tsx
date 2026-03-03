@@ -14,6 +14,7 @@ export default function GoalsPage() {
     // Form states
     const [purpose, setPurpose] = useState('');
     const [targetWeight, setTargetWeight] = useState('');
+    const [targetDate, setTargetDate] = useState('');
     const [bodyTarget, setBodyTarget] = useState('');
     const [injuryHistory, setInjuryHistory] = useState('');
 
@@ -34,6 +35,7 @@ export default function GoalsPage() {
                 setProfile(profileData);
                 setPurpose(profileData.exercise_purpose || '');
                 setTargetWeight(profileData.target_weight?.toString() || '');
+                setTargetDate(profileData.target_date || '');
                 setBodyTarget(profileData.body_target || '');
                 setInjuryHistory(profileData.injury_history || '');
             }
@@ -64,6 +66,7 @@ export default function GoalsPage() {
         await supabase.from('profiles').update({
             exercise_purpose: purpose,
             target_weight: parseFloat(targetWeight) || null,
+            target_date: targetDate || null,
             body_target: bodyTarget,
             injury_history: injuryHistory,
         }).eq('id', user.id);
@@ -106,6 +109,15 @@ export default function GoalsPage() {
                             onChange={(e) => setTargetWeight(e.target.value)}
                             className="w-full px-4 py-3 rounded-xl border border-white/10 bg-background/50 focus:border-primary transition-colors"
                             placeholder="예: 70"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-foreground/70 mb-1">최종 목표 달성일</label>
+                        <input
+                            type="date"
+                            value={targetDate}
+                            onChange={(e) => setTargetDate(e.target.value)}
+                            className="w-full px-4 py-3 rounded-xl border border-white/10 bg-background/50 focus:border-primary transition-colors"
                         />
                     </div>
                     <div>

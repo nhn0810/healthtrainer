@@ -56,7 +56,7 @@ export async function POST(req: Request) {
             - 건강/부상 특이사항: ${profile.injury_history || '없음'}
             - 과거 체중(2주전): ${oldPlan?.plan_data?.currentWeight || '알 수 없음'} kg
             - 현재 측정 체중: ${currentWeight} kg
-            - 최종 목표 체중: ${profile.target_weight} kg
+            - 최종 목표 체중: ${profile.target_weight} kg (달성 기한: ${profile.target_date || '미정'})
 
             [2주간 식단 평가 요약]
             ${progressSummary}
