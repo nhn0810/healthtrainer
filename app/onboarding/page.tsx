@@ -23,7 +23,7 @@ export default function OnboardingPage() {
         targetWeight: '',
         environment: '자취방 (좁은 공간)',
         equipment: '맨몸',
-        duration: '4'
+        duration: '2' // Fixed to 2 weeks
     });
 
     const handleNext = () => {
@@ -168,16 +168,10 @@ export default function OnboardingPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm text-foreground/70">목표 달성 기간 (주)</label>
-                                    <select
-                                        value={formData.duration}
-                                        onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary outline-none appearance-none"
-                                    >
-                                        <option value="4">4주 (1개월)</option>
-                                        <option value="8">8주 (2개월)</option>
-                                        <option value="12">12주 (3개월)</option>
-                                    </select>
+                                    <label className="text-sm text-foreground/70">목표 달성 기간</label>
+                                    <div className="w-full px-4 py-3 rounded-xl border border-white/10 bg-background/50 text-foreground/70 font-medium">
+                                        트레이너가 2주 단위 플랜을 제공합니다.
+                                    </div>
                                 </div>
 
                                 {error && <p className="text-sm text-red-500 font-medium">{error}</p>}

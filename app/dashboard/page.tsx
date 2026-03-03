@@ -11,9 +11,17 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>(null);
     const [todayPlan, setTodayPlan] = useState<any>(null);
+    const [planDoc, setPlanDoc] = useState<any>(null);
     const [fullPlan, setFullPlan] = useState<any>(null);
+    const [dailyProgress, setDailyProgress] = useState<any>(null);
     const [progress, setProgress] = useState(0); // 0 to 100
     const [currentWeight, setCurrentWeight] = useState(0);
+    const [evalCalories, setEvalCalories] = useState('');
+    const [evalNote, setEvalNote] = useState('');
+    const [evalLoading, setEvalLoading] = useState(false);
+    const [briefingWeight, setBriefingWeight] = useState('');
+    const [briefingLoading, setBriefingLoading] = useState(false);
+    const [isPlanExpired, setIsPlanExpired] = useState(false);
     const supabase = createClient();
     const router = useRouter(); // Import useRouter at the top of the file
 
@@ -21,6 +29,8 @@ export default function DashboardPage() {
         async function loadDashboardData() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
+
+            const todayString = new Date().toISOString().split('T')[0];
 
             // Fetch Profile
             const { data: profileData } = await supabase
@@ -57,22 +67,27 @@ export default function DashboardPage() {
                 .limit(1)
                 .single();
 
-            if (planData && planData.plan_data?.workoutRoutines) {
-                // Find today's plan (simplistic: getting the first day or matching actual weekday)
-                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                const todayName = days[new Date().getDay()];
+            if (planData) {
+                setPlanDoc(planData);
+                const isOver = planData.end_date && new Date(planData.end_date) <= new Date(todayString) && !planData.is_completed;
+                if (isOver) setIsPlanExpired(true);
 
-                const routineToday = planData.plan_data.workoutRoutines.find(
-                    (r: any) => r.day === todayName || r.day.includes(todayName.slice(0, 3))
-                );
+                if (planData.plan_data?.workoutRoutines) {
+                    // Find today's plan (simplistic: getting the first day or matching actual weekday)
+                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    const todayName = days[new Date().getDay()];
 
-                // Fallback to first day if no exact match
-                setTodayPlan(routineToday || planData.plan_data.workoutRoutines[0]);
-                setFullPlan(planData.plan_data);
+                    const routineToday = planData.plan_data.workoutRoutines.find(
+                        (r: any) => r.day === todayName || r.day.includes(todayName.slice(0, 3))
+                    );
+
+                    // Fallback to first day if no exact match
+                    setTodayPlan(routineToday || planData.plan_data.workoutRoutines[0]);
+                    setFullPlan(planData.plan_data);
+                }
             }
 
             // Fetch Daily Progress
-            const todayString = new Date().toISOString().split('T')[0];
             const { data: progressData } = await supabase
                 .from('daily_progress')
                 .select('*')
@@ -82,13 +97,15 @@ export default function DashboardPage() {
 
             if (progressData) {
                 setProgress(progressData.progress_rate || 0);
+                setDailyProgress(progressData);
             } else {
                 // Create initial progress record for today
-                await supabase.from('daily_progress').insert({
+                const { data: newProgress } = await supabase.from('daily_progress').insert({
                     user_id: user.id,
                     date: todayString,
                     progress_rate: 0
-                });
+                }).select().single();
+                if (newProgress) setDailyProgress(newProgress);
             }
 
             setLoading(false);
@@ -97,9 +114,89 @@ export default function DashboardPage() {
         loadDashboardData();
     }, []);
 
+    const submitDietEvaluation = async () => {
+        if (!evalCalories) return;
+        setEvalLoading(true);
+
+        try {
+            const res = await fetch('/api/diet-evaluation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    consumedCalories: evalCalories,
+                    userNote: evalNote,
+                    targetCalories: fullPlan?.dailyCaloriesTarget || 2000
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setDailyProgress((prev: any) => ({ ...prev, diet_evaluation: data.evaluation, daily_calories: evalCalories }));
+            }
+        } catch (error) {
+            console.error(error);
+        }
+        setEvalLoading(false);
+    };
+
+    const submitBiweeklyBriefing = async () => {
+        if (!briefingWeight) return;
+        setBriefingLoading(true);
+
+        try {
+            const res = await fetch('/api/biweekly-briefing', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentWeight: briefingWeight, planId: planDoc.id })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`[2주간의 성과 요약]\n\n${data.briefing}\n\n새로운 2주 플랜이 성공적으로 발급되었습니다!`);
+                window.location.reload();
+            } else {
+                alert(data.error || '에러가 발생했습니다.');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+        setBriefingLoading(false);
+    };
+
     // Calculate SVG stroke offset for the circle
     const circumference = 2 * Math.PI * 84; // r=84
     const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+    if (isPlanExpired) {
+        return (
+            <div className="flex flex-col min-h-screen p-6 pt-12 items-center justify-center max-w-md mx-auto text-center space-y-6">
+                <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-[0_0_30px_rgba(0,123,255,0.4)]">
+                    🎉
+                </div>
+                <h1 className="text-2xl font-bold">2주 플랜 종료!</h1>
+                <p className="text-foreground/70">
+                    수고하셨습니다! 지난 2주 동안의 식습관과 운동 기록을 종합하여 평가를 진행합니다.
+                </p>
+
+                <div className="w-full glass p-6 rounded-3xl mt-4 space-y-4">
+                    <label className="block text-sm font-bold text-left">현재 몸무게를 입력해주세요</label>
+                    <input
+                        type="number"
+                        placeholder="예: 70"
+                        value={briefingWeight}
+                        onChange={(e) => setBriefingWeight(e.target.value)}
+                        className="w-full px-4 py-3 text-lg font-bold rounded-xl border border-white/10 bg-background/50 focus:border-primary text-center"
+                    />
+                    <button
+                        onClick={submitBiweeklyBriefing}
+                        disabled={briefingLoading || !briefingWeight}
+                        className="w-full py-4 bg-primary text-primary-foreground font-bold rounded-xl shadow-lg mt-4"
+                    >
+                        {briefingLoading ? 'AI가 2주 결과 분석 및 다음 플랜 수립 중...' : '결과 브리핑 및 다음 2주 플랜 발급받기'}
+                    </button>
+                    {briefingLoading && <p className="text-xs text-primary/70 mt-2 animate-pulse">평균 10~15초 소요됩니다.</p>}
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col min-h-screen p-6 pt-12 pb-24 max-w-md mx-auto relative">
@@ -180,6 +277,42 @@ export default function DashboardPage() {
                                 <span>지방: {fullPlan.macros?.fat_g || 0}g</span>
                             </div>
                         </Link>
+
+                        {/* Evening Diet Evaluation */}
+                        {dailyProgress && !dailyProgress.diet_evaluation ? (
+                            <div className="p-5 rounded-2xl bg-secondary/30 border border-white/5 space-y-3 mt-4">
+                                <h4 className="font-bold text-sm">🌙 오늘의 식습관 저녁 평가</h4>
+                                <p className="text-xs text-foreground/60">오늘 총 섭취한 칼로리를 입력하면 AI가 평가합니다.</p>
+                                <input
+                                    type="number"
+                                    placeholder="총 섭취 칼로리 (예: 1800)"
+                                    value={evalCalories}
+                                    onChange={(e) => setEvalCalories(e.target.value)}
+                                    className="w-full px-4 py-2 rounded-xl border border-white/10 bg-background/50 text-sm focus:border-primary transition-colors"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="특이사항 메모 (옵션)"
+                                    value={evalNote}
+                                    onChange={(e) => setEvalNote(e.target.value)}
+                                    className="w-full px-4 py-2 rounded-xl border border-white/10 bg-background/50 text-sm focus:border-primary transition-colors"
+                                />
+                                <button
+                                    onClick={submitDietEvaluation}
+                                    disabled={evalLoading || !evalCalories}
+                                    className="w-full py-2 bg-primary text-primary-foreground font-bold rounded-xl text-sm"
+                                >
+                                    {evalLoading ? '평가 중...' : '평가 받기'}
+                                </button>
+                            </div>
+                        ) : dailyProgress?.diet_evaluation ? (
+                            <div className="p-5 rounded-2xl bg-primary/10 border border-primary/20 space-y-2 mt-4 mt-4">
+                                <h4 className="font-bold text-sm text-primary">✨ 오늘의 식습관 평가 완료</h4>
+                                <div className="text-sm text-foreground/80 leading-relaxed font-medium">
+                                    {dailyProgress.diet_evaluation}
+                                </div>
+                            </div>
+                        ) : null}
                     </div>
                 ) : (
                     <div className="p-8 text-center rounded-2xl glass border border-white/5">
