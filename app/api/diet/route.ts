@@ -17,16 +17,17 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: limitCheck.reason }, { status: 403 });
         }
 
-        const { base64Data, mimeType } = await req.json();
+        const { base64Data, mimeType, extraText } = await req.json();
 
         if (!base64Data || !mimeType) {
             return NextResponse.json({ error: '데이터가 없습니다.' }, { status: 400 });
         }
 
-        // 1. Analyze with Gemini 1.5 Flash (Vision)
+        // 1. Analyze with Gemini 3 Flash (Vision)
         const prompt = `
       당신은 AI 영양사 및 다이어트 코치입니다.
       첨부된 음식 사진을 분석하여 다음 JSON 스키마 형식으로 응답해주세요. 마크다운 없이 오직 JSON만 반환해야 합니다.
+      ${extraText ? `\n[사용자 추가 코멘트]\n"${extraText}"\n(이 코멘트를 적극 반영해서 칼로리와 영양소를 산출하세요.)` : ''}
 
       [요구 스키마]
       {

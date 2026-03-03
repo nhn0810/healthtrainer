@@ -25,12 +25,12 @@ export async function checkAndConsumeAiLimit(userId: string) {
         currentCount = 0;
     }
 
-    const MAX_FREE = 5; // 하루 무료 횟수 (토큰 낭비 방지)
-    const MAX_PREMIUM = 100; // 하루 프리미엄 횟수
+    const MAX_FREE = 100; // 하루 무료 횟수 (토큰 낭비 방지용으로 널널하게)
+    const MAX_PREMIUM = 9999; // 하루 프리미엄 횟수 무제한급
     const limit = profile.is_premium ? MAX_PREMIUM : MAX_FREE;
 
     if (currentCount >= limit) {
-        return { allowed: false, reason: `일일 식단/상담 횟수(${limit}회)를 모두 사용했습니다. 서버비가 없어서 무료 제공이 힘들어요 ㅠㅠ 설정 메뉴에서 'freecode08100810'을 입력해 무제한 코드를 해제해주세요!` };
+        return { allowed: false, reason: `일일 식단/상담 횟수(${limit}회)를 모두 사용했습니다. 내일 다시 이용하시거나 무제한 코드를 해제해주세요!` };
     }
 
     // Consume limit

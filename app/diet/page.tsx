@@ -13,6 +13,8 @@ export default function DietLogPage() {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [todayLogs, setTodayLogs] = useState<any[]>([]);
     const [analysisResult, setAnalysisResult] = useState<any | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [extraText, setExtraText] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const supabase = createClient();
 
@@ -34,13 +36,21 @@ export default function DietLogPage() {
         loadLogs();
     }, [analysisResult]); // Reload when new analysis is done
 
-    const handleImageCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        setSelectedFile(file);
+        setImagePreview(URL.createObjectURL(file));
+        setAnalysisResult(null);
+        setError('');
+        setExtraText('');
+    };
+
+    const handleUploadAndAnalyze = async () => {
+        if (!selectedFile) return;
 
         setLoading(true);
         setError('');
-        setImagePreview(URL.createObjectURL(file));
         setAnalysisResult(null);
 
         try {
@@ -52,7 +62,7 @@ export default function DietLogPage() {
                 fileType: 'image/webp'
             };
 
-            const compressedBlob = await imageCompression(file, options);
+            const compressedBlob = await imageCompression(selectedFile, options);
 
             // 2. Blob to Base64
             const reader = new FileReader();
@@ -65,7 +75,8 @@ export default function DietLogPage() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         base64Data,
-                        mimeType: 'image/webp'
+                        mimeType: 'image/webp',
+                        extraText
                     })
                 });
 
@@ -73,6 +84,7 @@ export default function DietLogPage() {
                 if (!response.ok) throw new Error(data.error);
 
                 setAnalysisResult({ ...data.analysis, id: data.log.id });
+                setSelectedFile(null); // Reset selection
                 setLoading(false);
             };
 
@@ -114,30 +126,60 @@ export default function DietLogPage() {
             </div>
 
             {/* Camera / Upload Action */}
-            <div className="mb-10 text-center">
+            <div className="mb-10 text-center relative">
                 <input
                     type="file"
                     accept="image/*"
-                    capture="environment" // Will trigger camera directly on mobile devices
                     className="hidden"
                     ref={fileInputRef}
-                    onChange={handleImageCapture}
+                    onChange={handleImageSelect}
                 />
 
-                <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={loading}
-                    className="w-48 h-48 mx-auto rounded-full bg-gradient-to-tr from-primary/30 to-accent/30 border-4 border-primary/20 flex flex-col items-center justify-center hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 shadow-[0_0_40px_rgba(0,123,255,0.2)]"
-                >
-                    {loading ? (
-                        <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                    ) : (
-                        <>
-                            <Camera className="w-12 h-12 text-primary mb-2" />
-                            <span className="font-bold">사진으로 기록하기</span>
-                        </>
-                    )}
-                </button>
+                {!selectedFile && !loading && (
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={loading}
+                        className="w-48 h-48 mx-auto rounded-full bg-gradient-to-tr from-primary/30 to-accent/30 border-4 border-primary/20 flex flex-col items-center justify-center hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:scale-100 shadow-[0_0_40px_rgba(0,123,255,0.2)]"
+                    >
+                        <Camera className="w-12 h-12 text-primary mb-2" />
+                        <span className="font-bold">사진으로 기록하기</span>
+                    </button>
+                )}
+
+                {/* Confirm & Context Input UI */}
+                {selectedFile && !loading && (
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 glass rounded-2xl">
+                        <div
+                            className="w-full h-48 bg-cover bg-center rounded-xl overflow-hidden shadow-inner mb-4 relative"
+                            style={{ backgroundImage: `url(${imagePreview})` }}
+                        />
+                        <input
+                            type="text"
+                            maxLength={100}
+                            placeholder="추가 코멘트 (예: 고기 2점 추가, 밥 반공기 남김)"
+                            value={extraText}
+                            onChange={(e) => setExtraText(e.target.value)}
+                            className="w-full p-3 rounded-xl bg-background/50 border border-white/10 text-sm mb-4"
+                        />
+                        <div className="flex gap-2">
+                            <button onClick={() => setSelectedFile(null)} className="flex-1 p-3 rounded-xl bg-secondary text-foreground/70 font-bold hover:bg-secondary/80 transition-colors">
+                                취소
+                            </button>
+                            <button onClick={handleUploadAndAnalyze} className="flex-1 p-3 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                                <UploadCloud className="w-5 h-5" />
+                                분석 시작
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {loading && (
+                    <div className="w-48 h-48 mx-auto flex flex-col justify-center items-center">
+                        <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+                        <span className="font-bold text-sm text-primary">AI 영양사가 분석 중...</span>
+                    </div>
+                )}
+
                 {error && <p className="text-red-500 text-sm font-bold mt-4">{error}</p>}
             </div>
 

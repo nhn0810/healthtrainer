@@ -11,6 +11,7 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>(null);
     const [todayPlan, setTodayPlan] = useState<any>(null);
+    const [fullPlan, setFullPlan] = useState<any>(null);
     const [progress, setProgress] = useState(0); // 0 to 100
     const [currentWeight, setCurrentWeight] = useState(0);
     const supabase = createClient();
@@ -67,6 +68,7 @@ export default function DashboardPage() {
 
                 // Fallback to first day if no exact match
                 setTodayPlan(routineToday || planData.plan_data.workoutRoutines[0]);
+                setFullPlan(planData.plan_data);
             }
 
             // Fetch Daily Progress
@@ -120,9 +122,18 @@ export default function DashboardPage() {
                 {/* Decorative background glow */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-primary/20 blur-3xl rounded-full" />
 
-                <div className="w-48 h-48 rounded-full border-[12px] border-primary/10 flex flex-col items-center justify-center relative z-10">
+                <div className="w-48 h-48 flex flex-col items-center justify-center relative z-10">
+                    <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 192 192">
+                        <circle
+                            cx="96" cy="96" r="84"
+                            className="stroke-primary/10"
+                            strokeWidth="12"
+                            fill="transparent"
+                        />
+                    </svg>
                     <motion.svg
                         className="absolute inset-0 w-full h-full -rotate-90"
+                        viewBox="0 0 192 192"
                         initial={{ strokeDashoffset: circumference }}
                         animate={{ strokeDashoffset }}
                         transition={{ duration: 1.5, ease: "easeOut" }}
@@ -148,33 +159,27 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Today's Workout Routine Preview */}
+            {/* Custom Diet Recommendation Preview */}
             <div className="space-y-4 flex-1">
                 <div className="flex justify-between items-end mb-2">
-                    <h3 className="text-lg font-bold">오늘의 추천 프로그램</h3>
+                    <h3 className="text-lg font-bold">사용자 맞춤 식단 추천</h3>
                 </div>
 
                 {loading ? (
                     <div className="h-24 rounded-2xl bg-secondary animate-pulse" />
-                ) : todayPlan ? (
+                ) : fullPlan ? (
                     <div className="space-y-3">
-                        {todayPlan.exercises.slice(0, 3).map((ex: any, idx: number) => (
-                            <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-secondary/50 border border-border">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center shadow-sm">
-                                        <span className="text-primary font-bold">{idx + 1}</span>
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold">{ex.name}</h4>
-                                        <p className="text-xs text-foreground/60">{ex.sets}세트 × {ex.reps}</p>
-                                    </div>
-                                </div>
-                                <div className="w-6 h-6 rounded-full border-2 border-border" />
+                        <Link href="/diet" className="block p-5 rounded-2xl bg-secondary/50 border border-border hover:bg-secondary/70 transition-colors">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="font-bold">오늘의 식단 목표</h4>
+                                <span className="text-primary font-bold">{fullPlan.dailyCaloriesTarget || 2000} kcal</span>
                             </div>
-                        ))}
-                        {todayPlan.exercises.length > 3 && (
-                            <p className="text-center text-xs text-foreground/50 py-2">외 {todayPlan.exercises.length - 3}종목</p>
-                        )}
+                            <div className="flex justify-between text-sm text-foreground/70">
+                                <span>단백질: {fullPlan.macros?.protein_g || 0}g</span>
+                                <span>탄수화물: {fullPlan.macros?.carbs_g || 0}g</span>
+                                <span>지방: {fullPlan.macros?.fat_g || 0}g</span>
+                            </div>
+                        </Link>
                     </div>
                 ) : (
                     <div className="p-8 text-center rounded-2xl glass border border-white/5">
